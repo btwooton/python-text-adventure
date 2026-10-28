@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import attrs
+
 from typing import Literal
 
 from game.ui_helpers import get_colored_string
@@ -7,30 +9,24 @@ from game.ui_helpers import get_colored_string
 # custom type for room exit directions
 Direction = Literal["NORTH", "SOUTH", "EAST", "WEST"]
 
+@attrs.define()
 class Entity:
 
-    def __init__(self, id: str, name: str, description: str) -> None:
-        self.id = id
-        self.name = name
-        self.description = description
+    id: str
+    name: str
+    description: str
 
+@attrs.define()
 class Item(Entity):
 
-    def __init__(self, id, name, description, is_gettable: bool = False) -> None:
-        super().__init__(
-            id, name, description
-        )
-        self.is_gettable = is_gettable
-        self.contents = {}
+    is_gettable: bool
+    contents: dict[str, Item] = attrs.field(factory=dict)
 
+@attrs.define()
 class Room(Entity):
 
-    def __init__(self, id, name, description):
-        super().__init__(
-            id, name, description
-        )
-        self.exits = {}
-        self.items = {}
+    exits: dict[str, Direction] = attrs.field(factory=dict)
+    items: dict[str, Item] = attrs.field(factory=dict)
 
     def add_exit(self, direction: Direction, room_id: str):
         self.exits[direction] = room_id
@@ -45,9 +41,9 @@ class Room(Entity):
         return full_description
 
 
-class Player:
+@attrs.define()
+class Player(Entity):
 
-    def __init__(self, current_room_id: str) -> None:
-        self.current_room_id = current_room_id
-        self.inventory = {}
+    current_room_id: str
+    inventory: dict[str, Item] = attrs.field(factory=dict)
 

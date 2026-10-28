@@ -25,6 +25,9 @@ def main() -> None:
     # initialize the game world
     g.world = game.world.GameWorld()
     g.player = game.models.Player(
+        id="player",
+        name="The Player",
+        description="The intrepid hero of the story",
         current_room_id=g.world.load_world().id
     )
     with tcod.context.new(console=g.console, tileset=tileset) as g.context:
