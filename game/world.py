@@ -27,8 +27,16 @@ class GameWorld:
             "You begin sneezing uncontrollably."
         )
 
+        self.rooms["up_staircase"] = Room(
+            "up_staircase",
+            "a large wooden staircase with a red carpeted runner",
+            "The stairs ascend into misty darkness." 
+        )
+
         self.rooms["lobby"].add_exit("NORTH", "hallway")
         self.rooms["hallway"].add_exit("SOUTH", "lobby")
+        self.rooms["hallway"].add_exit("NORTH", "up_staircase")
+        self.rooms["up_staircase"].add_exit("SOUTH", "hallway")
         self.rooms["lobby"].add_exit("WEST", "janitors_closet")
         self.rooms["janitors_closet"].add_exit("EAST", "lobby")
 
