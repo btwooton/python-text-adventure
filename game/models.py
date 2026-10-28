@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Literal
 
+from game.ui_helpers import get_colored_string
+
 # custom type for room exit directions
 Direction = Literal["NORTH", "SOUTH", "EAST", "WEST"]
 
@@ -39,7 +41,7 @@ class Room(Entity):
             self.description
         )
         for _, item in self.items.items():
-            full_description += f" There is a {item.name} here. " + item.description
+            full_description += f" There is a {get_colored_string(item.name, 255, 255, 0)} here. " + item.description
         return full_description
 
 
