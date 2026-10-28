@@ -23,8 +23,8 @@ DIRECTION_KEYS: Final = {
     KeySym.j: (0, 1),
 }
 
-CONSOLE_WIDTH = 60
-CONSOLE_HEIGHT = 40
+CONSOLE_WIDTH = 80
+CONSOLE_HEIGHT = 50
 
 cmap = lambda code: tcod.tileset.CHARMAP_CP437[code]
 
