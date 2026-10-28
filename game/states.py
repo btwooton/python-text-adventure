@@ -46,7 +46,7 @@ class InGame(State):
         description = room.get_description()
         exits = room.exits
         self.intro_blurb = game.menus.MenuPanel(child_item=game.menus.WrappedText(
-            max_width=30,
+            max_width=40,
             text=description
         ), padding_horizontal=2, padding_vertical=2)   
 
@@ -59,7 +59,7 @@ class InGame(State):
                 for exit_direction, room_id in exits.items()
             ] + [
                 game.menus.SelectItem(
-                    f"Get {item.name}",
+                    f"Get: {item.name}",
                     callback=make_get_callback(item_id, room_id)
                 )
                     for item_id, item in room.items.items()
