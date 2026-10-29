@@ -14,3 +14,5 @@ states: list[game.state.State] = [] # stack of states with top active
 world: game.world.GameWorld
 
 player: game.models.Player
+
+narrative: list[str] = []

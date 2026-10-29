@@ -13,6 +13,7 @@ from tcod.event import KeySym
 import game.state_tools
 import game.constants as constants
 from game.state import Pop, StateResult, State
+from game.ui_helpers import get_colored_string, strip_coloration
 
 
 class MenuItem(Protocol):
@@ -162,6 +163,42 @@ class WrappedText(MenuItem):
 
     def get_rendered_height(self):
         return tcod.console.get_height_rect(self.max_width, self.text)
+
+
+@attrs.define()
+class FixedSizeTextArea(MenuItem):
+
+    max_width: int
+    max_height: int
+    paragraphs: list[str] = attrs.field(factory=list)
+
+    def on_draw(self, console: tcod.console.Console, x: int, y: int, highlight: bool) -> None:
+        # display only the last 5 paragraphs
+        paragraphs_to_display = self.paragraphs[-10:]
+        # now highlight the last paragraph and gray out the others
+        text = "\n\n".join([
+            get_colored_string(p, 255, 255, 255) 
+            if i == len(paragraphs_to_display) - 1 
+            else get_colored_string(strip_coloration(p), 64, 64, 64)
+            for i, p in enumerate(paragraphs_to_display)
+        ])
+        console.print(
+            x, y,
+            text=text,
+            width=self.max_width,
+            height=self.max_height,
+            fg=(255, 255, 255)
+        )
+
+    def on_event(self, event: tcod.event.Event) -> StateResult:
+        return None
+
+    def get_rendered_width(self) -> int:
+        return self.max_width
+
+    def get_rendered_height(self) -> int:
+        return self.max_height
+
 
 
 @attrs.define()

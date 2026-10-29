@@ -30,6 +30,7 @@ def main() -> None:
         description="The intrepid hero of the story",
         current_room_id=g.world.load_world().id
     )
+    g.narrative.append(g.world.get_room(g.player.current_room_id).get_description())
     with tcod.context.new(console=g.console, tileset=tileset) as g.context:
         game.state_tools.main_loop()
 

@@ -8,11 +8,13 @@ from collections.abc import Callable
 import g
 import game.menus
 from game.state import State, Reset, Push, StateResult
+import game.constants as constants
 
 
 def enter_room(room_id: str) -> StateResult:
     g.player.current_room_id = room_id
-    return Reset(InGame(room_id))
+    g.narrative.append(g.world.get_room(room_id).get_description())
+    return Reset(InGame())
 
 def make_move_callback(room_id: str) -> Callable[[], StateResult]:
     def enter_chosen_room() -> StateResult:
@@ -25,8 +27,9 @@ def get_item(item_id: str, room_id: str) -> StateResult:
     item = room.items.pop(item_id, None)
     if item is not None:
         g.player.inventory[item_id] = item
+        g.narrative.append(f"You get the {item.name}")
 
-    return Reset(InGame(room_id))
+    return Reset(InGame())
 
 
 def make_get_callback(item_id: str, room_id: str) -> Callable[[], StateResult]:
@@ -40,14 +43,14 @@ def make_get_callback(item_id: str, room_id: str) -> Callable[[], StateResult]:
 class InGame(State):
     """Primary in-game state."""
 
-    def __init__(self, room_id: str) -> None:
-        print(f"Initializing InGame with room_id {room_id}")
-        room = g.world.get_room(room_id)
-        description = room.get_description()
+    def __init__(self) -> None:
+        room_id = g.player.current_room_id
+        room = g.world.get_room(g.player.current_room_id)
         exits = room.exits
-        self.intro_blurb = game.menus.MenuPanel(child_item=game.menus.WrappedText(
-            max_width=40,
-            text=description
+        self.narrative_area = game.menus.MenuPanel(child_item=game.menus.FixedSizeTextArea(
+            max_width=constants.CONSOLE_WIDTH - 30,
+            max_height=constants.CONSOLE_HEIGHT - 20,
+            paragraphs=g.narrative
         ), padding_horizontal=2, padding_vertical=2)   
 
         self.player_choices = game.menus.MenuPanel(child_item=game.menus.ListMenu(
@@ -77,12 +80,13 @@ class InGame(State):
                 return self.player_choices.on_event(event)
 
     def on_draw(self, console: tcod.console.Console) -> None:
-        self.intro_blurb.on_draw(console, 4, 4, False)
+        console.rgb["fg"] = (255, 255, 255)
+        self.narrative_area.on_draw(console, 5, 2, False)
 
-        self.player_choices.on_draw(console, 4, 4 + self.intro_blurb.get_rendered_height() + 4, False)
+        self.player_choices.on_draw(console, 5, 2 + self.narrative_area.get_rendered_height(), False)
 
     def update_rendered_description(self, description: str) -> None:
-        self.intro_blurb.child_item.text = description
+        self.narrative_area.paragraphs.append(description)
 
 type MenuCallback = Callable[[], StateResult]
 
@@ -116,11 +120,11 @@ class PaneledMainMenu(game.menus.MenuState):
 
     @staticmethod
     def continue_() -> StateResult:
-        return Reset(InGame(g.player.current_room_id))
+        return Reset(InGame())
 
     @staticmethod
     def new_game() -> StateResult:
-        return Reset(InGame(g.player.current_room_id))
+        return Reset(InGame())
 
     @staticmethod
     def quit() -> StateResult:

@@ -33,6 +33,7 @@ def main_loop() -> None:
     """Run the active state forever."""
     while g.states:
         main_draw()
+        print(f"Current narrative is f{g.narrative}")
         for event in tcod.event.wait():
             tile_event = g.context.convert_event(event)
             if g.states:
